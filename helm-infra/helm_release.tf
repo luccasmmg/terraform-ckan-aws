@@ -10,8 +10,46 @@ provider "helm" {
   }
 }
 
+
+
+resource "helm_release" "ngnix_ingress" {
+  name        = "nginx-ingress-production"
+  chart       = "ingress-nginx"
+  repository  = "https://kubernetes.github.io/ingress-nginx"
+  version     = "3.33.0"
+
+  set {
+    name = "rbac.create"
+    value = true
+  }
+
+  set {
+    name = "controller.service.externalTrafficPolicy"
+    value = "Local"
+  }
+
+  set {
+    name = "controller.publishService.enabled"
+    value = true
+  }
+
+  set {
+    name = "controller.replicaCount"
+    value = "3"
+  }
+}
+
 resource "helm_release" "ckan" {
 	name = "ckan"
 	chart = "ckan"
   repository = "https://keitaro-charts.storage.googleapis.com"
+
+	set {
+    name  = "ingress.enabled"
+    value = "true"
+  }
+	# I'm not really sure that is need but lets put it anyway
+	depends_on = [
+    helm_release.ngnix_ingress
+  ]
 }
