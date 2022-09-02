@@ -10,6 +10,12 @@ provider "helm" {
   }
 }
 
+resource "helm_release" "sealed_secrets" {
+  name       = "sealed-secrets-controller"
+  repository = "https://charts.bitnami.com/bitnami"
+  chart      = "sealed-secrets"
+}
+
 resource "helm_release" "ngnix_ingress" {
   name        = "nginx-ingress-production"
   chart       = "ingress-nginx"
